@@ -103,7 +103,7 @@ h1 .glow { color:var(--lime); }
 .toggle-btn.active { border-color:var(--line); background:rgba(158,255,0,.10); color:#dfffbb; }
 .gallery { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
 .card {
-  position:relative; overflow:visible; padding:14px; border-radius:24px; border:1px solid var(--line);
+  position:relative; overflow:hidden; padding:14px; border-radius:24px; border:1px solid var(--line);
   background:linear-gradient(180deg, rgba(8,12,8,.96), rgba(3,5,3,.98)); box-shadow:0 0 24px rgba(158,255,0,.07);
 }
 .card::before { content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(circle at top, rgba(158,255,0,.14), transparent 34%); }
@@ -114,8 +114,7 @@ h1 .glow { color:var(--lime); }
   margin-top:14px; padding:12px; border-radius:18px; border:1px solid rgba(158,255,0,.14);
   background:rgba(0,0,0,.74); box-shadow:inset 0 0 16px rgba(158,255,0,.08);
 }
-.chamber img { display:block; width:85%; aspect-ratio:1/1; object-fit:cover; border-radius:14px; border:1px solid rgba(158,255,0,.12); background:#000; margin:0 auto; transition:box-shadow 0.3s ease }
-.chamber img:hover { box-shadow:0 0 0 3px rgba(158,255,0,.25),0 0 20px rgba(158,255,0,.5),0 0 40px rgba(158,255,0,.25) }
+.chamber img { display:block; width:85%; aspect-ratio:1/1; object-fit:cover; border-radius:14px; border:1px solid rgba(158,255,0,.12); background:#000; margin:0 auto; }
 .stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:12px; }
 .stat { padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.36); }
 .stat .k { font-size:10px; text-transform:uppercase; letter-spacing:.16em; color:rgba(243,245,239,.4); }
@@ -184,7 +183,7 @@ h1 .glow { color:var(--lime); }
 }
 
 /* Badge hover effects */
-.sat-badge-wrapper{display:inline-block;position:relative;cursor:pointer;margin:2px;overflow:visible}
+.sat-badge-wrapper{display:inline-block;position:relative;cursor:pointer;margin:2px}
 .sat-badge{width:36px;height:36px;object-fit:contain;background:transparent;border-radius:4px;transition:all 0.3s ease;image-rendering:pixelated}
 .sat-badge-wrapper:hover .sat-badge{width:64px;height:64px;box-shadow:0 0 20px rgba(0,255,136,0.8),0 0 40px rgba(0,255,136,0.5);filter:brightness(1.2) saturate(1.15);z-index:100;position:relative}
 .sat-badge-tooltip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#00ff88;padding:8px 12px;border-radius:4px;font-size:12px;white-space:nowrap;border:1px solid rgba(0,255,136,0.4);z-index:101}
@@ -451,8 +450,6 @@ let currentDna = 'All DNA';
 let currentSat = 'All Satributes';
 let currentSearch = '';
 let currentSort = 'rank-asc';
-let currentPage = 1;
-const ITEMS_PER_PAGE = 50;
 
 const hero = {
   inscription_id: 'f926209aa58f4f03b01d9691e6c29d05f77b6b87132f74cd6c2d2182f9726e4di0',
@@ -521,12 +518,7 @@ function getFiltered() {
 function renderGallery(items) {
   const root = document.getElementById('gallery');
   root.innerHTML = '';
-  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
-  const start = (currentPage - 1) * ITEMS_PER_PAGE;
-  const end = start + ITEMS_PER_PAGE;
-  const pageItems = items.slice(start, end);
-  
-  pageItems.forEach((s) => {
+  items.forEach((s) => {
     const el = document.createElement('article');
     el.className = 'card';
     el.innerHTML = `
@@ -550,57 +542,6 @@ function renderGallery(items) {
     root.appendChild(el);
   });
   root.querySelectorAll('button[data-open]').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.open)));
-  renderPagination(totalPages);
-}
-
-function renderPagination(totalPages) {
-  let pagination = document.getElementById('pagination');
-  if (!pagination) {
-    pagination = document.createElement('div');
-    pagination.id = 'pagination';
-    pagination.style.cssText = 'display:flex;justify-content:center;gap:8px;margin-top:24px;flex-wrap:wrap;';
-    document.getElementById('gallery').after(pagination);
-  }
-  pagination.innerHTML = '';
-  if (totalPages <= 1) return;
-  
-  // Always show current page, next page, and last page
-  const pagesToShow = [];
-  pagesToShow.push(currentPage);
-  if (currentPage < totalPages) pagesToShow.push(currentPage + 1);
-  if (!pagesToShow.includes(totalPages)) pagesToShow.push(totalPages);
-  
-  pagesToShow.forEach((page, idx) => {
-    const btn = document.createElement('button');
-    btn.textContent = page;
-    btn.className = 'pill';
-    if (page === currentPage) btn.classList.add('active');
-    btn.addEventListener('click', () => { currentPage = page; renderGallery(getFiltered()); window.scrollTo({top: document.getElementById('gallery').offsetTop - 100, behavior:'smooth'}); });
-    pagination.appendChild(btn);
-    // Add separator if not last
-    if (idx < pagesToShow.length - 1) {
-      pagination.appendChild(document.createTextNode(' ... '));
-    }
-  });
-  
-  // Add dropdown for all pages on hover over the "..."
-  if (totalPages > 3) {
-    const dropdown = document.createElement('span');
-    dropdown.style.cssText = 'position:relative;display:inline-block;';
-    dropdown.innerHTML = '<button class="pill" style="padding:4px 8px;">⋮</button><div class="page-dropdown" style="display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.95);border:1px solid rgba(158,255,0,0.4);border-radius:8px;padding:8px;max-height:200px;overflow-y:auto;z-index:1000;">';
-    for (let i = 1; i <= totalPages; i++) {
-      const pageBtn = document.createElement('button');
-      pageBtn.textContent = i;
-      pageBtn.className = 'pill' + (i === currentPage ? ' active' : '');
-      pageBtn.style.cssText = 'margin:2px;min-width:36px;';
-      pageBtn.addEventListener('click', () => { currentPage = i; renderGallery(getFiltered()); window.scrollTo({top: document.getElementById('gallery').offsetTop - 100, behavior:'smooth'}); });
-      dropdown.querySelector('.page-dropdown').appendChild(pageBtn);
-    }
-    dropdown.querySelector('.page-dropdown').innerHTML += '</div>';
-    dropdown.addEventListener('mouseenter', () => { dropdown.querySelector('.page-dropdown').style.display = 'block'; });
-    dropdown.addEventListener('mouseleave', () => { dropdown.querySelector('.page-dropdown').style.display = 'none'; });
-    pagination.appendChild(dropdown);
-  }
 }
 
 function renderTimeline(items) {
@@ -685,7 +626,6 @@ function closeModal() {
 }
 
 function renderAll() {
-  currentPage = 1;
   const filtered = getFiltered();
   document.getElementById('resultCount').textContent = `${filtered.length} specimen${filtered.length === 1 ? '' : 's'} visible`;
   renderGallery(filtered);
