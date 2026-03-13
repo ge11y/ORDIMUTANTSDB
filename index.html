@@ -208,7 +208,7 @@ h1 .glow { color:var(--lime); }
 .sat-badge{width:40px;height:40px;object-fit:contain;background:transparent;border-radius:4px;transition:all 0.3s ease;image-rendering:pixelated;vertical-align:middle}
 .sat-badge[alt="Block 9"]{width:38px;height:38px;filter:brightness(100)}
 .sat-badge-wrapper:hover .sat-badge{width:64px;height:64px;box-shadow:0 0 20px rgba(0,255,136,0.8),0 0 40px rgba(0,255,136,0.5);filter:brightness(1.2) saturate(1.15);z-index:100;position:relative;line-height:64px}
-.sat-badge-wrapper:hover .sat-badge[alt="Block 9"]{width:62px;height:62px;filter:brightness(100);box-shadow:0 0 20px rgba(0,255,136,0.8),0 0 40px rgba(0,255,136,0.5)}
+.sat-badge-wrapper:hover .sat-badge[alt="Block 9"]{width:64px;height:64px;filter:brightness(100);box-shadow:0 0 20px rgba(0,255,136,0.8),0 0 40px rgba(0,255,136,0.5);z-index:100;position:relative}
 .sat-badge-tooltip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#00ff88;padding:8px 12px;border-radius:4px;font-size:12px;white-space:nowrap;border:1px solid rgba(0,255,136,0.4);z-index:101}
 .sat-badge-wrapper:hover .sat-badge-tooltip{display:block}
 .sat-badge-wrapper:hover::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;background-image:url('assets/badges/badge-hover.gif');background-size:contain;background-repeat:no-repeat;pointer-events:none;z-index:50;margin-top:0}
